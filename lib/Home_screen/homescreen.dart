@@ -8,8 +8,8 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  List<String> todos = ['make an app'];
-  List<String> titles = ['College'];
+  List<String> todos = ['Make an App'];
+  List<String> titles = ['Flutter'];
   List tasksNo = [1];
 
   TextEditingController addTodoController = TextEditingController();
