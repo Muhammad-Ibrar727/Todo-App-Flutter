@@ -1,0 +1,225 @@
+
+
+
+
+import 'package:flutter/material.dart';
+
+class Homescreen extends StatefulWidget {
+  const Homescreen({super.key});
+
+  @override
+  State<Homescreen> createState() => _HomescreenState();
+}
+
+class _HomescreenState extends State<Homescreen> {
+  List<String> todos = ['Make an app'];
+  List<String> titles = ['College'];
+  List<bool> completed = [false]; // List to track completion status
+
+  TextEditingController addTodoController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController titleUpdateController = TextEditingController();
+  TextEditingController todosUpdateController = TextEditingController();
+
+  void _toggleCompletion(int index) {
+    setState(() {
+      completed[index] = !completed[index]; // Toggle completion status
+    });
+  }
+
+  void _deleteTodo(int index) {
+    setState(() {
+      titles.removeAt(index);
+      todos.removeAt(index);
+      completed.removeAt(index); // Remove completion status as well
+    });
+  }
+
+  void _editTodo(int index) {
+    titleUpdateController.text = titles[index];
+    todosUpdateController.text = todos[index];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Todo'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: titleUpdateController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter new Title',
+                  hintStyle: TextStyle(color: Colors.black38),
+                ),
+              ),
+              TextFormField(
+                controller: todosUpdateController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter new Todo',
+                  hintStyle: TextStyle(color: Colors.black38),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  titles[index] = titleUpdateController.text;
+                  todos[index] = todosUpdateController.text;
+                  titleUpdateController.clear();
+                  todosUpdateController.clear();
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 152, 182, 206),
+        title: const Row(
+          children: [
+            Text('Todo App'),
+            Spacer(),
+            CircleAvatar(
+              child: Icon(
+                Icons.person,
+                color: Colors.amber,
+              ),
+            ),
+          ],
+        ),
+      ),
+      drawer: const Drawer(
+        width: 250,
+        shadowColor: Colors.amber,
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+            child: TextFormField(
+              decoration: InputDecoration(
+                fillColor: const Color.fromARGB(255, 231, 236, 240),
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                border: InputBorder.none,
+                hintText: 'Search...',
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: const BorderSide(color: Color.fromARGB(255, 179, 216, 247), width: 2),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: todos.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: completed[index],
+                        onChanged: (value) {
+                          _toggleCompletion(index);
+                        },
+                      ),
+                      Expanded(
+                        child: Text(
+                          todos[index],
+                          style: TextStyle(
+                            decoration: completed[index]
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () => _editTodo(index),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _deleteTodo(index),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Add Todo'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        hintText: 'Enter the Title',
+                        hintStyle: TextStyle(color: Colors.black38),
+                      ),
+                      controller: titleController,
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        hintText: 'Enter the Todo',
+                        hintStyle: TextStyle(color: Colors.black38),
+                      ),
+                      controller: addTodoController,
+                    ),
+                  ],
+                ),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        todos.add(addTodoController.text);
+                        titles.add(titleController.text);
+                        completed.add(false); // Add default completion status
+                        addTodoController.clear();
+                        titleController.clear();
+                      });
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('ADD'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: const Icon(
+          Icons.add,
+          size: 30,
+        ),
+      ),
+    );
+  }
+}
+
